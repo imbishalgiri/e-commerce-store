@@ -1,18 +1,44 @@
 import firebase from 'firebase/app';
-
 import 'firebase/firestore';
 import 'firebase/auth';
 
 const config = {
-    apiKey: "AIzaSyDMliezbMWrlXymwq568rarY_NP9za2F9g",
-    authDomain: "shop-db-5da3d.firebaseapp.com",
-    databaseURL: "https://shop-db-5da3d.firebaseio.com",
-    projectId: "shop-db-5da3d",
-    storageBucket: "shop-db-5da3d.appspot.com",
-    messagingSenderId: "987558791515",
-    appId: "1:987558791515:web:e2af7281c042f502a6727e",
-    measurementId: "G-6FYDCZH4LF"
-  };
+    apiKey: "AIzaSyBu-7N3dmNajLveklQEYEoqCMykCGuy5h4",
+    authDomain: "my-shop-e70e6.firebaseapp.com",
+    databaseURL: "https://my-shop-e70e6.firebaseio.com",
+    projectId: "my-shop-e70e6",
+    storageBucket: "my-shop-e70e6.appspot.com",
+    messagingSenderId: "714269323760",
+    appId: "1:714269323760:web:c9436db65ad5e6f8fc6d35",
+    measurementId: "G-5KLXD6F2SE"
+};
+
+
+export const createUserProfileDocument = async (userAuth, otherData) => {
+    if(!userAuth) return
+
+    const userRef =  firestore.doc(`users/${userAuth.uid}`);
+    const snapshot = await userRef.get();
+    
+    if(!snapshot.exists) {
+        // create a piece of data
+        const { displayName, email } = userAuth;
+        const createdAt = new Date();
+
+        try {
+            await userRef.set({
+                displayName,
+                email, 
+                createdAt,
+                ...otherData
+            })
+        } catch (err){
+            console.log('erorr creating the user', err.message);
+        }
+    }
+    return userRef;
+}
+
 
 firebase.initializeApp(config);
 

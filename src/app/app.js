@@ -6,7 +6,7 @@ import ShopPage from '../pages/shoppage/Shop.component';
 import Authentication from '../pages/authentication/Authentication.component';
 import Header from '../components/header/Header.component';
 import './app.styles.scss';
-import { auth } from '../components/firebase/firebase.utils';
+import { auth, createUserProfileDocument } from '../components/firebase/firebase.utils';
 
 
 class App extends React.Component{
@@ -24,9 +24,22 @@ class App extends React.Component{
 		// the parameter user of the anonymous function is
 		// given by the firebase to see the users 
 	    // on the firebase database 
-		this.unsubscribeFromAuth = auth.onAuthStateChanged( user => {
-			this.setState({currentUser: user})
-			console.log(user);
+		this.unsubscribeFromAuth = auth.onAuthStateChanged( async userAuth => {
+			if (userAuth){
+				const userRef = await createUserProfileDocument(userAuth);
+				userRef.onSnapshot(snapshot => {
+					this.setState({
+						currentUser: {
+							id: snapshot.id,
+							...snapshot.data()
+						}
+					}, () => {
+						console.log(this.state)
+					})
+				})
+				
+			}
+			this.setState({ currentUser: userAuth })
 		})
 	}
 
